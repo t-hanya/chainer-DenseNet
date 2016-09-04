@@ -4,7 +4,15 @@ from chainer.training import extension
 
 class StepShift(extension.Extension):
 
-    """Trainer extention to change an optimizer attribute on specified time."""
+    """Trainer extention to change an optimizer attribute on specified timing.
+
+    Args:
+        attr (str): Name of the attribute to change:
+        shifts (list of tuple(int, float)): List of pairs of timing and target
+            value. Timing is specified as count of calls.
+        optimizer (~chainer.Optimizer): Target optimizer object. If it is None,
+            the main optimizer of the trainer is used.
+    """
 
     invoke_before_training = True
 
