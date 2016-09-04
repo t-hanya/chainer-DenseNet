@@ -1,6 +1,4 @@
 # -*- coding: utf-8 -*-
-from __future__ import division
-
 from chainer.training import extension
 
 
@@ -19,7 +17,8 @@ class StepShift(extension.Extension):
     def __call__(self, trainer):
         for time, value in self._shifts:
             if self._t == time:
-                optimizer = self._optimizer or trainer.updater.get_optimizer('main')
+                if not self._optimizer:
+                    optimizer = trainer.updater.get_optimizer('main')
                 setattr(optimizer, self._attr, value)
         self._t += 1
 
