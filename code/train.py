@@ -63,7 +63,7 @@ def main():
     eval_model.train = False
 
     # setup optimizer
-    optimizer = chainer.optimizers.MomentumSGD(lr=0.1, momentum=0.9)
+    optimizer = chainer.optimizers.NesterovAG(lr=0.1, momentum=0.9)
     optimizer.setup(model)
     optimizer.add_hook(chainer.optimizer.WeightDecay(1e-4))
 
