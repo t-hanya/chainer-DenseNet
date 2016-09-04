@@ -2,15 +2,15 @@
 
 import math
 
-import chainer 
+import chainer
 import chainer.functions as F
 import chainer.links as L
 
 
 class DenseBlock(chainer.Chain):
     """DenseBlock Layer"""
-    
-    def __init__(self, in_channels, n_layers, growth_rate, 
+
+    def __init__(self, in_channels, n_layers, growth_rate,
                  dropout_ratio=None):
 
         super(DenseBlock, self).__init__()
@@ -18,7 +18,7 @@ class DenseBlock(chainer.Chain):
         self._layers = []
         sum_channels = in_channels
         for l in range(n_layers):
-            conv = L.Convolution2D(sum_channels, growth_rate, 3, pad=1, 
+            conv = L.Convolution2D(sum_channels, growth_rate, 3, pad=1,
                                    wscale=math.sqrt(2))
             norm = L.BatchNormalization(sum_channels)
             self.add_link('conv{}'.format(l + 1), conv)
@@ -27,7 +27,7 @@ class DenseBlock(chainer.Chain):
             sum_channels += growth_rate
 
         self.add_persistent('dropout_ratio', dropout_ratio)
-    
+
     def __call__(self, x, test=True):
         h_all = x
         for conv, norm in self._layers:
@@ -41,15 +41,15 @@ class DenseBlock(chainer.Chain):
 
 class TransitionLayer(chainer.Chain):
     """Transition Layer"""
-    
+
     def __init__(self, in_channels, out_channels, dropout_ratio=None):
         super(TransitionLayer, self).__init__(
             norm=L.BatchNormalization(in_channels),
-            conv=L.Convolution2D(in_channels, out_channels, 3, pad=1, 
+            conv=L.Convolution2D(in_channels, out_channels, 3, pad=1,
                                  wscale=math.sqrt(2)),
         )
         self.add_persistent('dropout_ratio', dropout_ratio)
-        
+
     def __call__(self, x, test=True):
         h = self.conv(F.relu(self.norm(x, test=test)))
         if self.dropout_ratio:
@@ -60,16 +60,16 @@ class TransitionLayer(chainer.Chain):
 
 class DenseNet(chainer.Chain):
     """Densely Connected Convolutional Networks
-    
-    see: https://arxiv.org/abs/1608.06993"""
-    
-    def __init__(self, depth=40, growth_rate=12, in_channels=16, 
+
+    see: https://arxiv.org/abs/1608.06993
+    """
+
+    def __init__(self, depth=40, growth_rate=12, in_channels=16,
                  dropout_ratio=0.2, n_class=10):
-        
+
         assert (depth - 4) % 3 == 0
         n_layers = int((depth - 4) / 3)
-        n_ch = [in_channels + growth_rate * n_layers * i 
-                    for i in range(4)]
+        n_ch = [in_channels + growth_rate * n_layers * i for i in range(4)]
         dropout_ratio = dropout_ratio if dropout_ratio > 0 else None
 
         super(DenseNet, self).__init__(
@@ -94,7 +94,7 @@ class DenseNet(chainer.Chain):
     @train.setter
     def train(self, value):
         self._train = value
-    
+
     def __call__(self, x):
         test = not self.train
         h = self.conv0(x)
