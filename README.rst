@@ -19,5 +19,9 @@ Usage
 
 Train a DenseNet on CIFAR-10 dataset using::
 
-    python code/train.py --gpu 0
+   python code/train.py --gpu 0 -o result
+
+Visualize training result using::
+
+   python code/visualize.py result/log -o result
 
