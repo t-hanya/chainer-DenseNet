@@ -25,7 +25,8 @@ class StepShift(extension.Extension):
     def __call__(self, trainer):
         for time, value in self._shifts:
             if self._t == time:
-                if not self._optimizer:
+                optimizer = self._optimizer
+                if not optimizer:
                     optimizer = trainer.updater.get_optimizer('main')
                 setattr(optimizer, self._attr, value)
         self._t += 1
