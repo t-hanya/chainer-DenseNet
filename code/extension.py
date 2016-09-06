@@ -23,12 +23,14 @@ class StepShift(extension.Extension):
         self._t = 0
 
     def __call__(self, trainer):
-        for time, value in self._shifts:
-            if self._t == time:
-                optimizer = self._optimizer
-                if not optimizer:
-                    optimizer = trainer.updater.get_optimizer('main')
-                setattr(optimizer, self._attr, value)
+        t_passed = [t for t, v in self._shifts if t <= self._t]
+        if t_passed:
+            t_last = max(t_passed)
+            v_last = [v for t, v in self._shifts if t == t_last][0]
+            optimizer = self._optimizer
+            if not optimizer:
+                optimizer = trainer.updater.get_optimizer('main')
+            setattr(optimizer, self._attr, v_last)
         self._t += 1
 
     def serialize(self, serializer):
