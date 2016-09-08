@@ -25,3 +25,17 @@ Visualize training result using::
 
    python code/visualize.py result/log -o result
 
+
+Sample Result
+=============
+
+.. image:: img/training_loss.png
+   :width: 400
+
+.. image:: img/test_error.png
+   :width: 400
+
+- Model parameters: L = 40, k = 12
+- Batch size: 64
+- Dataset: C10 (CIFAR-10 dataset without data augmentation)
+
