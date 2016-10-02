@@ -45,7 +45,7 @@ class TransitionLayer(chainer.Chain):
     def __init__(self, in_channels, out_channels, dropout_ratio=None):
         super(TransitionLayer, self).__init__(
             norm=L.BatchNormalization(in_channels),
-            conv=L.Convolution2D(in_channels, out_channels, 3, pad=1,
+            conv=L.Convolution2D(in_channels, out_channels, 1, pad=0,
                                  wscale=math.sqrt(2)),
         )
         self.add_persistent('dropout_ratio', dropout_ratio)
