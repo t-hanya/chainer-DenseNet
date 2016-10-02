@@ -9,11 +9,11 @@ import argparse
 import math
 
 import chainer
-from chainer.datasets import cifar
 import chainer.links as L
 from chainer import training
 from chainer.training import extensions
 
+import dataset
 from extension import StepShift
 from model import DenseNet
 
@@ -40,13 +40,25 @@ def main():
                         help='Growth rate parameter')
     parser.add_argument('--dropout', '-D', type=float, default=0.2,
                         help='Dropout ratio')
+    parser.add_argument('--dataset', type=str, default='C10',
+                        choices=('C10', 'C10+', 'C100', 'C100+'),
+                        help='Dataset used for training (Default is C10)')
     args = parser.parse_args()
 
     # load dataset
-    train, test = cifar.get_cifar10()
-    train_iter = chainer.iterators.SerialIterator(train, args.batchsize)
-    test_iter = chainer.iterators.SerialIterator(test, args.batchsize,
-                                                 repeat=False, shuffle=False)
+    if args.dataset == 'C10':
+        train, test = dataset.get_C10()
+    elif args.dataset == 'C10+':
+        train, test = dataset.get_C10_plus()
+    elif args.dataset == 'C100':
+        train, test = dataset.get_C100()
+    elif args.dataset == 'C100+':
+        train, test = dataset.get_C100_plus()
+
+    train_iter = chainer.iterators.MultiprocessIterator(train, args.batchsize)
+    test_iter = chainer.iterators.MultiprocessIterator(test, args.batchsize,
+                                                       repeat=False,
+                                                       shuffle=False)
 
     # setup model
     model = L.Classifier(DenseNet(args.numlayers, args.growth, 16,
