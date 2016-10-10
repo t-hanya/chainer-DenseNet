@@ -72,7 +72,7 @@ def main():
         model.to_gpu()
 
     eval_model = model.copy()
-    eval_model.train = False
+    eval_model.predictor.train = False
 
     # setup optimizer
     optimizer = chainer.optimizers.NesterovAG(lr=0.1, momentum=0.9)
