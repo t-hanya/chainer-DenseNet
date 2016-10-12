@@ -77,7 +77,7 @@ def get_C10_plus():
     """CIFAR-10 dataset with data augmentaion"""
     train, test = cifar.get_cifar10()
     train_dataset = CIFARDataset(train, C10_MEAN, C10_STD, True)
-    test_dataset = CIFARDataset(test, C10_MEAN, C10_STD, True)
+    test_dataset = CIFARDataset(test, C10_MEAN, C10_STD, False)
 
     return train_dataset, test_dataset
 
@@ -96,6 +96,6 @@ def get_C100_plus():
 
     train, test = cifar.get_cifar100()
     train_dataset = CIFARDataset(train, C100_MEAN, C100_STD, True)
-    test_dataset = CIFARDataset(test, C100_MEAN, C100_STD, True)
+    test_dataset = CIFARDataset(test, C100_MEAN, C100_STD, False)
 
     return train_dataset, test_dataset
