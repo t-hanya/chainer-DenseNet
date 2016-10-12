@@ -14,6 +14,7 @@ from chainer import training
 from chainer.training import extensions
 
 import dataset
+from extension import Evaluator
 from extension import StepShift
 from model import DenseNet
 
@@ -71,9 +72,6 @@ def main():
         chainer.cuda.get_device(args.gpu).use()
         model.to_gpu()
 
-    eval_model = model.copy()
-    eval_model.predictor.train = False
-
     # setup optimizer
     optimizer = chainer.optimizers.NesterovAG(lr=0.1, momentum=0.9)
     optimizer.setup(model)
@@ -83,7 +81,7 @@ def main():
     updater = training.StandardUpdater(train_iter, optimizer, device=args.gpu)
     trainer = training.Trainer(updater, (args.epoch, 'epoch'), out=args.out)
 
-    trainer.extend(extensions.Evaluator(test_iter, eval_model,
+    trainer.extend(Evaluator(test_iter, model,
                                         device=args.gpu))
     trainer.extend(extensions.dump_graph('main/loss'))
     trainer.extend(extensions.snapshot(), trigger=(10, 'epoch'))

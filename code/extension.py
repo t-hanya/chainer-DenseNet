@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from chainer.training import extension
+from chainer.training import extensions
 
 
 class StepShift(extension.Extension):
@@ -35,3 +36,15 @@ class StepShift(extension.Extension):
 
     def serialize(self, serializer):
         self._t = serializer('_t', self._t)
+
+
+class Evaluator(extensions.Evaluator):
+    """Extension of chainer.extentions.Evaluator to set train flag"""
+
+    def evaluate(self):
+        target = self._targets['main']
+        target.predictor.train = False
+        result = super(Evaluator, self).evaluate()
+        target.predictor.train = True
+
+        return result
