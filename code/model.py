@@ -5,6 +5,7 @@ import math
 import chainer
 import chainer.functions as F
 import chainer.links as L
+from chainer import initializers
 
 
 class DenseBlock(chainer.Chain):
@@ -28,12 +29,12 @@ class DenseBlock(chainer.Chain):
 
         self.add_persistent('dropout_ratio', dropout_ratio)
 
-    def __call__(self, x, test=True):
+    def __call__(self, x):
         h_all = x
         for conv, norm in self._layers:
-            h = conv(F.relu(norm(h_all, test=test)))
+            h = conv(F.relu(norm(h_all)))
             if self.dropout_ratio:
-                h = F.dropout(h, ratio=self.dropout_ratio, train=not test)
+                h = F.dropout(h, ratio=self.dropout_ratio)
             h_all = F.concat((h_all, h))
 
         return h_all
@@ -51,10 +52,10 @@ class TransitionLayer(chainer.Chain):
         )
         self.add_persistent('dropout_ratio', dropout_ratio)
 
-    def __call__(self, x, test=True):
-        h = self.conv(F.relu(self.norm(x, test=test)))
+    def __call__(self, x):
+        h = self.conv(F.relu(self.norm(x)))
         if self.dropout_ratio:
-            h = F.dropout(h, ratio=self.dropout_ratio, train=not test)
+            h = F.dropout(h, ratio=self.dropout_ratio)
         h = F.average_pooling_2d(h, 2, stride=2)
         return h
 
@@ -97,14 +98,13 @@ class DenseNet(chainer.Chain):
         self._train = value
 
     def __call__(self, x):
-        test = not self.train
         h = self.conv0(x)
-        h = self.dense1(h, test=test)
-        h = self.trans1(h, test=test)
-        h = self.dense2(h, test=test)
-        h = self.trans2(h, test=test)
-        h = self.dense3(h, test=test)
-        h = F.relu(self.norm4(h, test=test))
+        h = self.dense1(h)
+        h = self.trans1(h)
+        h = self.dense2(h)
+        h = self.trans2(h)
+        h = self.dense3(h)
+        h = F.relu(self.norm4(h))
         h = F.average_pooling_2d(h, 8)   # input image size: 32x32
         h = self.fc4(h)
         return h
