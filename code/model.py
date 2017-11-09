@@ -18,8 +18,8 @@ class DenseBlock(chainer.Chain):
         self._layers = []
         sum_channels = in_channels
         for l in range(n_layers):
-            conv = L.Convolution2D(sum_channels, growth_rate, 3, pad=1,
-                                   wscale=math.sqrt(2))
+            W = initializers.HeNormal()
+            conv = L.Convolution2D(sum_channels, growth_rate, 3, pad=1, initialW=W)
             norm = L.BatchNormalization(sum_channels)
             self.add_link('conv{}'.format(l + 1), conv)
             self.add_link('norm{}'.format(l + 1), norm)
@@ -43,10 +43,11 @@ class TransitionLayer(chainer.Chain):
     """Transition Layer"""
 
     def __init__(self, in_channels, out_channels, dropout_ratio=None):
+        W=initializers.HeNormal()
         super(TransitionLayer, self).__init__(
             norm=L.BatchNormalization(in_channels),
             conv=L.Convolution2D(in_channels, out_channels, 1, pad=0,
-                                 wscale=math.sqrt(2)),
+                                 initialW=W),
         )
         self.add_persistent('dropout_ratio', dropout_ratio)
 
