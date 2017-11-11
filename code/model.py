@@ -87,15 +87,6 @@ class DenseNet(chainer.Chain):
             norm4=L.BatchNormalization(n_ch[3]),
             fc4=L.Linear(n_ch[3], n_class),
         )
-        self._train = True
-
-    @property
-    def train(self):
-        return self._train
-
-    @train.setter
-    def train(self, value):
-        self._train = value
 
     def __call__(self, x):
         h = self.conv0(x)
