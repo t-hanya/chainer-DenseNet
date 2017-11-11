@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from chainer.training import extension
-from chainer.training import extensions
 
 
 class LearningRateDrop(extension.Extension):
