@@ -17,15 +17,3 @@ class LearningRateDrop(extension.Extension):
         lr = getattr(opt, self._attr)
         lr *= self._drop_ratio
         setattr(opt, self._attr, lr)
-
-
-class Evaluator(extensions.Evaluator):
-    """Extension of chainer.extentions.Evaluator to set train flag"""
-
-    def evaluate(self):
-        target = self._targets['main']
-        target.predictor.train = False
-        result = super(Evaluator, self).evaluate()
-        target.predictor.train = True
-
-        return result
