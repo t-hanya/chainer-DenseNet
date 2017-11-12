@@ -98,6 +98,7 @@ def main():
                       int(args.epoch * 0.75)]
     lr_drop_trigger = triggers.ManualScheduleTrigger(lr_drop_epochs, 'epoch')
     trainer.extend(LearningRateDrop(0.1), trigger=lr_drop_trigger)
+    trainer.extend(extensions.observe_lr())
 
     if args.resume:
         chainer.serializers.load_npz(args.resume, trainer)
