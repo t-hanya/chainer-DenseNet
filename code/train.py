@@ -6,16 +6,15 @@ Training script of DenseNet on CIFAR-10 dataset.
 
 
 import argparse
-import math
 
 import chainer
 import chainer.links as L
 from chainer import training
 from chainer.training import extensions
+from chainer.training import triggers
 
 import dataset
-from extension import Evaluator
-from extension import StepShift
+from extension import LearningRateDrop
 from model import DenseNet
 
 
@@ -81,8 +80,8 @@ def main():
     updater = training.StandardUpdater(train_iter, optimizer, device=args.gpu)
     trainer = training.Trainer(updater, (args.epoch, 'epoch'), out=args.out)
 
-    trainer.extend(Evaluator(test_iter, model,
-                             device=args.gpu))
+    trainer.extend(extensions.Evaluator(test_iter, model,
+                                        device=args.gpu))
     trainer.extend(extensions.dump_graph('main/loss'))
     trainer.extend(extensions.snapshot(), trigger=(10, 'epoch'))
     trainer.extend(extensions.snapshot_object(
@@ -94,11 +93,11 @@ def main():
     trainer.extend(extensions.ProgressBar())
 
     # devide lr by 10 at 0.5, 0.75 fraction of total number of training epochs
-    iter_per_epoch = math.ceil(len(train) / args.batchsize)
-    n_iter1 = int(args.epoch * 0.5 * iter_per_epoch)
-    n_iter2 = int(args.epoch * 0.75 * iter_per_epoch)
-    shifts = [(n_iter1, 0.01), (n_iter2, 0.001)]
-    trainer.extend(StepShift('lr', shifts, optimizer))
+    lr_drop_epochs = [int(args.epoch * 0.5),
+                      int(args.epoch * 0.75)]
+    lr_drop_trigger = triggers.ManualScheduleTrigger(lr_drop_epochs, 'epoch')
+    trainer.extend(LearningRateDrop(0.1), trigger=lr_drop_trigger)
+    trainer.extend(extensions.observe_lr())
 
     if args.resume:
         chainer.serializers.load_npz(args.resume, trainer)

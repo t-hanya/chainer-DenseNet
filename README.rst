@@ -11,7 +11,8 @@ This is an experimental implementation of `Densely Connected Convolutional Netwo
 Requirements
 ============
 
-- `Chainer <http://chainer.org>`_  1.13+
+- `Chainer <http://chainer.org>`_  2.0+
+- `CuPy <https://cupy.chainer.org>`_ 1.0+
 
 
 Usage

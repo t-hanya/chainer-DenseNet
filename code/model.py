@@ -1,11 +1,9 @@
 # -*- coding: utf-8 -*-
 
-import math
-
 import chainer
 import chainer.functions as F
-import chainer.links as L
 from chainer import initializers
+import chainer.links as L
 
 
 class DenseBlock(chainer.Chain):
@@ -20,7 +18,8 @@ class DenseBlock(chainer.Chain):
         sum_channels = in_channels
         for l in range(n_layers):
             W = initializers.HeNormal()
-            conv = L.Convolution2D(sum_channels, growth_rate, 3, pad=1, initialW=W)
+            conv = L.Convolution2D(sum_channels, growth_rate, 3, pad=1,
+                                   initialW=W)
             norm = L.BatchNormalization(sum_channels)
             self.add_link('conv{}'.format(l + 1), conv)
             self.add_link('norm{}'.format(l + 1), norm)
@@ -44,7 +43,7 @@ class TransitionLayer(chainer.Chain):
     """Transition Layer"""
 
     def __init__(self, in_channels, out_channels, dropout_ratio=None):
-        W=initializers.HeNormal()
+        W = initializers.HeNormal()
         super(TransitionLayer, self).__init__(
             norm=L.BatchNormalization(in_channels),
             conv=L.Convolution2D(in_channels, out_channels, 1, pad=0,
@@ -87,15 +86,6 @@ class DenseNet(chainer.Chain):
             norm4=L.BatchNormalization(n_ch[3]),
             fc4=L.Linear(n_ch[3], n_class),
         )
-        self._train = True
-
-    @property
-    def train(self):
-        return self._train
-
-    @train.setter
-    def train(self, value):
-        self._train = value
 
     def __call__(self, x):
         h = self.conv0(x)
