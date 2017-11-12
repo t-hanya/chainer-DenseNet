@@ -11,7 +11,7 @@ class LearningRateDrop(extension.Extension):
         self._optimizer = optimizer
 
     def __call__(self, trainer):
-        opt =  self._optimizer or trainer.updater.get_optimizer('main')
+        opt = self._optimizer or trainer.updater.get_optimizer('main')
 
         lr = getattr(opt, self._attr)
         lr *= self._drop_ratio

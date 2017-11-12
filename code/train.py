@@ -6,7 +6,6 @@ Training script of DenseNet on CIFAR-10 dataset.
 
 
 import argparse
-import math
 
 import chainer
 import chainer.links as L
